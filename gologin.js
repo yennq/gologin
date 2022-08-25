@@ -152,22 +152,21 @@ class GoLogin {
     return readFile(path.resolve(__dirname, 'gologin_zeroprofile.b64')).then(res => res.toString());
   }
 
-  async getProfileS3(s3path) {
-    if (!s3path) {
+  async getProfileS3(s3SignedUrl) {
+    if (!s3SignedUrl) {
       throw new Error('s3path not found');
     }
 
     const token = this.access_token;
-    debug('getProfileS3 token=', token, 'profile=', this.profile_id, 's3path=', s3path);
+    debug('getProfileS3 token=', token, 'profile=', this.profile_id, 's3path=', s3SignedUrl);
 
-    const s3url = `https://gprofiles.gologin.com/${s3path}`.replace(/\s+/mg, '+');
-    debug('loading profile from public s3 bucket, url=', s3url);
-    const profileResponse = await requests.get(s3url, {
+    debug('loading profile from public s3 bucket, url=', s3SignedUrl);
+    const profileResponse = await requests.get(s3SignedUrl, {
       encoding: null
     });
 
     if (profileResponse.statusCode !== 200) {
-      debug(`Gologin S3 BUCKET ${s3url} response error ${profileResponse.statusCode}  - use empty`);
+      debug(`Gologin S3 BUCKET ${s3SignedUrl} response error ${profileResponse.statusCode}  - use empty`);
       return '';
     }
 
@@ -350,7 +349,7 @@ class GoLogin {
     const profileZipExists = await access(this.profile_zip_path).then(() => true).catch(() => false);
     if (!(local && profileZipExists)) {
       try {
-        profile_folder = await this.getProfileS3(_.get(profile, 's3Path', ''));
+        profile_folder = await this.getProfileS3(_.get(profile, 's3SignedUrl', ''));
       }
       catch (e) {
         debug('Cannot get profile - using empty', e);
