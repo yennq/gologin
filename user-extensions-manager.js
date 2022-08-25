@@ -210,7 +210,7 @@ class UserExtensionsManager {
       body: {
         existedUserChromeExtensions: this.#existedUserExtensions,
       }
-    }) || ['a'];
+    }) || [];
 
     const extensionsToDownloadPathsFiltered =
       extensionsToDownloadPaths.filter(extPath => userChromeExtensions.some(extId => extPath.includes(extId)));
