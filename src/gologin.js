@@ -5,7 +5,7 @@ import decompressUnzip from 'decompress-unzip';
 import { existsSync, mkdirSync, promises as _promises } from 'fs';
 import { get as _get } from 'https';
 import { tmpdir } from 'os';
-import { join, resolve as _resolve,sep } from 'path';
+import { join, resolve as _resolve, sep } from 'path';
 import requests from 'requestretry';
 import rimraf from 'rimraf';
 import ProxyAgent from 'simple-proxy-agent';
@@ -14,8 +14,10 @@ import { fontsCollection } from '../fonts.js';
 import { getCurrentProfileBookmarks } from './bookmarks/utils.js';
 import { updateProfileBookmarks, updateProfileProxy, updateProfileResolution, updateProfileUserAgent } from './browser/browser-api.js';
 import BrowserChecker from './browser/browser-checker.js';
-import { composeFonts, downloadCookies, setExtPathsAndRemoveDeleted, 
-  setOriginalExtPaths, uploadCookies } from './browser/browser-user-data-manager.js';
+import {
+  composeFonts, downloadCookies, setExtPathsAndRemoveDeleted,
+  setOriginalExtPaths, uploadCookies
+} from './browser/browser-user-data-manager.js';
 import { getChunckedInsertValues, getDB, loadCookiesFromFile } from './cookies/cookies-manager.js';
 import ExtensionsManager from './extensions/extensions-manager.js';
 import { archiveProfile } from './profile/profile-archiver.js';
@@ -258,7 +260,7 @@ export class GoLogin {
     }
 
     if (get(preferences, 'navigator.deviceMemory')) {
-      preferences.deviceMemory = get(preferences, 'navigator.deviceMemory')*1024;
+      preferences.deviceMemory = get(preferences, 'navigator.deviceMemory') * 1024;
     }
 
     if (get(preferences, 'navigator.language')) {
@@ -338,14 +340,14 @@ export class GoLogin {
     );
   }
 
-  async createStartup(local=false) {
+  async createStartup(local = false) {
     const profilePath = join(this.tmpdir, `gologin_profile_${this.profile_id}`);
     let profile;
     let profile_folder;
     await rimraf(profilePath, () => null);
     debug('-', profilePath, 'dropped');
     profile = await this.getProfile();
-    const { navigator = {}, fonts, os: profileOs  } = profile;
+    const { navigator = {}, fonts, os: profileOs } = profile;
     this.fontsMasking = fonts?.enableMasking;
     this.profileOs = profileOs;
     this.differentOs =
@@ -431,7 +433,7 @@ export class GoLogin {
       ExtensionsManagerInst.apiUrl = API_URL;
       await ExtensionsManagerInst.init()
         .then(() => ExtensionsManagerInst.updateExtensions())
-        .catch(() => {});
+        .catch(() => { });
       ExtensionsManagerInst.accessToken = this.access_token;
 
       await ExtensionsManagerInst.getExtensionsPolicies();
@@ -498,7 +500,7 @@ export class GoLogin {
       profile.proxy.username = get(profile, 'autoProxyUsername');
       profile.proxy.password = get(profile, 'autoProxyPassword');
     }
-    // console.log('proxy=', proxy);
+    console.log('proxy=', proxy);
 
     if (proxy.mode === 'geolocation') {
       proxy.mode = 'http';
@@ -542,7 +544,7 @@ export class GoLogin {
 
     const audioContext = profile.audioContext || {};
     const { mode: audioCtxMode = 'off', noise: audioCtxNoise } = audioContext;
-    if (profile.timezone.fillBasedOnIp==false) {
+    if (profile.timezone.fillBasedOnIp == false) {
       profile.timezone = { id: profile.timezone.timezone };
     } else {
       profile.timezone = { id: this._tz.timezone };
@@ -593,7 +595,7 @@ export class GoLogin {
 
     const languages = this.language.replace(/;|q=[\d\.]+/img, '')
 
-    if (preferences.gologin==null) {
+    if (preferences.gologin == null) {
       preferences.gologin = {};
     }
 
@@ -690,11 +692,11 @@ export class GoLogin {
     }
 
     let data = null;
-    if (proxy!==null && proxy.mode !== 'none') {
+    if (proxy !== null && proxy.mode !== 'none') {
       if (proxy.mode.includes('socks')) {
-        for (let i=0; i<5; i++) {
+        for (let i = 0; i < 5; i++) {
           try {
-            debug('getting timeZone socks try', i+1);
+            debug('getting timeZone socks try', i + 1);
 
             return this.getTimezoneWithSocks(proxy);
           } catch (e) {
@@ -1054,7 +1056,7 @@ export class GoLogin {
       os = options.os;
     }
 
-    const fingerprint = await requests.get(`${API_URL}/browser/fingerprint?os=${os}`,{
+    const fingerprint = await requests.get(`${API_URL}/browser/fingerprint?os=${os}`, {
       headers: {
         'Authorization': `Bearer ${this.access_token}`,
         'User-Agent': 'gologin-api',
@@ -1084,7 +1086,7 @@ export class GoLogin {
       deviceMemory = 1;
     }
 
-    navigator.deviceMemory = deviceMemory*1024;
+    navigator.deviceMemory = deviceMemory * 1024;
     webGLMetadata.mode = webGLMetadata.mode === 'noise' ? 'mask' : 'off';
 
     const json = {
@@ -1150,16 +1152,16 @@ export class GoLogin {
 
     if (options.navigator) {
       Object.keys(options.navigator).map((e) => {
-        profile.navigator[e]=options.navigator[e];
+        profile.navigator[e] = options.navigator[e];
       });
     }
 
     Object.keys(options).filter(e => e !== 'navigator').map((e) => {
-      profile[e]=options[e];
+      profile[e] = options[e];
     });
 
     debug('update profile', profile);
-    const response = await requests.put(`https://api.gologin.com/browser/${options.id}`,{
+    const response = await requests.put(`https://api.gologin.com/browser/${options.id}`, {
       json: profile,
       headers: {
         'Authorization': `Bearer ${this.access_token}`,
@@ -1317,7 +1319,7 @@ export class GoLogin {
     await this.stopAndCommit(opts, true);
   }
 
-  async waitDebuggingUrl(delay_ms, try_count=0) {
+  async waitDebuggingUrl(delay_ms, try_count = 0) {
     await delay(delay_ms);
     const url = `https://${this.profile_id}.orbita.gologin.com/json/version`;
     console.log('try_count=', try_count, 'url=', url);
@@ -1334,7 +1336,7 @@ export class GoLogin {
       wsUrl = parsedBody.webSocketDebuggerUrl;
     } catch (e) {
       if (try_count < 3) {
-        return this.waitDebuggingUrl(delay_ms, try_count+1);
+        return this.waitDebuggingUrl(delay_ms, try_count + 1);
       }
 
       return { 'status': 'failure', wsUrl, 'message': 'Check proxy settings', 'profile_id': this.profile_id };
@@ -1369,7 +1371,7 @@ export class GoLogin {
       throw new Error('invalid token');
     }
 
-    const { navigator = {}, fonts, os: profileOs  } = profile;
+    const { navigator = {}, fonts, os: profileOs } = profile;
     this.fontsMasking = fonts?.enableMasking;
     this.profileOs = profileOs;
     this.differentOs =
